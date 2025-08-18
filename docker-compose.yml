@@ -55,7 +55,7 @@ services:
       EMBEDDING_MODEL: nomic-embed-text
       EMBEDDING_DIM: 0
       # Demo mode - set to true to show demo login credentials
-      DEMO_MODE: true
+      DEMO_MODE: "false"
       # Centralized timeout configuration with proper hierarchy
       # Frontend API: 30s > Backend AI: 25s > Ollama Service: 20s > Health Check: 5s
       OLLAMA_HEALTH_CHECK_TIMEOUT_MS: 5000
