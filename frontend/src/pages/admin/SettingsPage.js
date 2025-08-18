@@ -56,10 +56,14 @@ import { useSnackbar } from 'notistack';
 
 import { useAuth } from '../../services/AuthContext';
 import { documentsAPI, usersAPI, workspacesAPI } from '../../services/api';
+import { shouldEnforceDemoMode } from '../../utils/superUser';
 
 const SettingsPage = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, demoMode } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
+
+  // Check if demo mode restrictions should apply to this user
+  const isDemoModeRestricted = shouldEnforceDemoMode(user, demoMode);
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -151,6 +155,17 @@ const SettingsPage = () => {
     loadSettings();
     loadSystemInfo();
   }, []);
+
+  // Apply demo mode defaults when demo mode is detected (but not for super users)
+  useEffect(() => {
+    if (shouldEnforceDemoMode(user, demoMode)) {
+      setSettings(prevSettings => ({
+        ...prevSettings,
+        aiProviderType: 'google',
+        enableAISearch: true
+      }));
+    }
+  }, [demoMode, user]);
 
   const loadSettings = async () => {
     setLoading(true);
@@ -424,12 +439,22 @@ const SettingsPage = () => {
             variant="contained"
             startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
             onClick={handleSaveSettings}
-            disabled={saving}
+            disabled={saving || isDemoModeRestricted}
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </Box>
       </Box>
+
+      {/* Demo Mode Alert */}
+      {isDemoModeRestricted && (
+        <Alert severity="warning" sx={{ mb: 4 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+            Demo Mode Active
+          </Typography>
+          Settings are visible but cannot be modified in demo mode. All form fields are disabled.
+        </Alert>
+      )}
 
       {/* System Status */}
       <Paper sx={{ p: 3, mb: 4 }}>
@@ -511,6 +536,7 @@ const SettingsPage = () => {
                   label="Site Name"
                   value={settings.siteName}
                   onChange={(e) => handleSettingChange('siteName', e.target.value)}
+                  disabled={isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -520,6 +546,7 @@ const SettingsPage = () => {
                     value={settings.defaultUserRole}
                     onChange={(e) => handleSettingChange('defaultUserRole', e.target.value)}
                     label="Default User Role"
+                    disabled={isDemoModeRestricted}
                   >
                     <MenuItem value="basic">Basic</MenuItem>
                     <MenuItem value="basic-upload">Basic + Upload</MenuItem>
@@ -542,6 +569,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.maintenanceMode}
                       onChange={(e) => handleSettingChange('maintenanceMode', e.target.checked)}
+                      disabled={isDemoModeRestricted}
                     />
                   }
                   label="Maintenance Mode"
@@ -553,6 +581,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.allowRegistration}
                       onChange={(e) => handleSettingChange('allowRegistration', e.target.checked)}
+                      disabled={isDemoModeRestricted}
                     />
                   }
                   label="Allow User Registration"
@@ -576,6 +605,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.searchResultsPerPage}
                   onChange={(e) => handleSettingChange('searchResultsPerPage', parseInt(e.target.value))}
+                  disabled={isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -585,6 +615,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.maxSearchResults}
                   onChange={(e) => handleSettingChange('maxSearchResults', parseInt(e.target.value))}
+                  disabled={isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -593,6 +624,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.enableAutoComplete}
                       onChange={(e) => handleSettingChange('enableAutoComplete', e.target.checked)}
+                      disabled={isDemoModeRestricted}
                     />
                   }
                   label="Enable Auto-complete"
@@ -604,6 +636,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.enableSearchSuggestions}
                       onChange={(e) => handleSettingChange('enableSearchSuggestions', e.target.checked)}
+                      disabled={isDemoModeRestricted}
                     />
                   }
                   label="Enable Search Suggestions"
@@ -624,6 +657,7 @@ const SettingsPage = () => {
                       checked={settings.enableAISearch}
                       onChange={(e) => handleSettingChange('enableAISearch', e.target.checked)}
                       color="primary"
+                      disabled={isDemoModeRestricted}
                     />
                   }
                   label={
@@ -741,6 +775,7 @@ const SettingsPage = () => {
                           </InputAdornment>
                         )
                       }}
+                      disabled={isDemoModeRestricted}
                     />
                     
                     {settings.aiProviderType === 'azure-openai' && (
@@ -752,6 +787,7 @@ const SettingsPage = () => {
                         placeholder="https://your-resource.openai.azure.com"
                         sx={{ mb: 2 }}
                         helperText="Your Azure OpenAI service endpoint URL"
+                        disabled={isDemoModeRestricted}
                       />
                     )}
                     
@@ -765,6 +801,7 @@ const SettingsPage = () => {
                       placeholder="You are a helpful IT assistant for documentation search..."
                       sx={{ mb: 2 }}
                       helperText="Override the default system prompt for AI responses"
+                      disabled={isDemoModeRestricted}
                     />
                   </>
                 )}
@@ -796,6 +833,7 @@ const SettingsPage = () => {
                           </InputAdornment>
                         )
                       }}
+                      disabled={isDemoModeRestricted}
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
@@ -822,6 +860,7 @@ const SettingsPage = () => {
                         label="Custom Model Name"
                         placeholder="Enter custom Ollama model name"
                         helperText="Enter the exact name of your custom Ollama model"
+                        disabled={isDemoModeRestricted}
                       />
                     </Grid>
                   )}
@@ -833,6 +872,7 @@ const SettingsPage = () => {
                       value={settings.maxTokens}
                       onChange={(e) => handleSettingChange('maxTokens', parseInt(e.target.value))}
                       helperText="Maximum response length"
+                      disabled={isDemoModeRestricted}
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
@@ -879,6 +919,7 @@ const SettingsPage = () => {
                       value={settings.aiResponseTimeout}
                       onChange={(e) => handleSettingChange('aiResponseTimeout', parseInt(e.target.value))}
                       helperText="How long to wait for AI responses before timing out"
+                      disabled={isDemoModeRestricted}
                     />
                   </Grid>
                 </>
@@ -901,6 +942,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.maxFileSize}
                   onChange={(e) => handleSettingChange('maxFileSize', parseInt(e.target.value))}
+                  disabled={isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -910,6 +952,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.maxFilesPerUpload}
                   onChange={(e) => handleSettingChange('maxFilesPerUpload', parseInt(e.target.value))}
+                  disabled={isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -918,6 +961,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.enableBulkUpload}
                       onChange={(e) => handleSettingChange('enableBulkUpload', e.target.checked)}
+                      disabled={isDemoModeRestricted}
                     />
                   }
                   label="Enable Bulk Upload"
@@ -929,6 +973,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.autoProcessDocuments}
                       onChange={(e) => handleSettingChange('autoProcessDocuments', e.target.checked)}
+                      disabled={isDemoModeRestricted}
                     />
                   }
                   label="Auto-process Documents"
@@ -949,6 +994,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.retentionPeriod}
                   onChange={(e) => handleSettingChange('retentionPeriod', parseInt(e.target.value))}
+                  disabled={isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -958,6 +1004,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.maxStorageSize}
                   onChange={(e) => handleSettingChange('maxStorageSize', parseInt(e.target.value))}
+                  disabled={isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -966,6 +1013,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.enableAutoCleanup}
                       onChange={(e) => handleSettingChange('enableAutoCleanup', e.target.checked)}
+                      disabled={isDemoModeRestricted}
                     />
                   }
                   label="Enable Auto Cleanup"
@@ -977,6 +1025,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.compressionEnabled}
                       onChange={(e) => handleSettingChange('compressionEnabled', e.target.checked)}
+                      disabled={isDemoModeRestricted}
                     />
                   }
                   label="Enable Compression"
@@ -1000,6 +1049,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.sessionTimeout}
                   onChange={(e) => handleSettingChange('sessionTimeout', parseInt(e.target.value))}
+                  disabled={isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -1009,6 +1059,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.passwordMinLength}
                   onChange={(e) => handleSettingChange('passwordMinLength', parseInt(e.target.value))}
+                  disabled={isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -1018,6 +1069,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.maxLoginAttempts}
                   onChange={(e) => handleSettingChange('maxLoginAttempts', parseInt(e.target.value))}
+                  disabled={isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -1027,6 +1079,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.lockoutDuration}
                   onChange={(e) => handleSettingChange('lockoutDuration', parseInt(e.target.value))}
+                  disabled={isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -1035,6 +1088,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.requireStrongPasswords}
                       onChange={(e) => handleSettingChange('requireStrongPasswords', e.target.checked)}
+                      disabled={isDemoModeRestricted}
                     />
                   }
                   label="Require Strong Passwords"
@@ -1046,6 +1100,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.enableTwoFactor}
                       onChange={(e) => handleSettingChange('enableTwoFactor', e.target.checked)}
+                      disabled={isDemoModeRestricted}
                     />
                   }
                   label="Enable Two-Factor Authentication"
@@ -1068,6 +1123,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.enableEmailNotifications}
                       onChange={(e) => handleSettingChange('enableEmailNotifications', e.target.checked)}
+                      disabled={isDemoModeRestricted}
                     />
                   }
                   label="Enable Email Notifications"
@@ -1079,7 +1135,7 @@ const SettingsPage = () => {
                   label="SMTP Server"
                   value={settings.smtpServer}
                   onChange={(e) => handleSettingChange('smtpServer', e.target.value)}
-                  disabled={!settings.enableEmailNotifications}
+                  disabled={!settings.enableEmailNotifications || isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -1089,7 +1145,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.smtpPort}
                   onChange={(e) => handleSettingChange('smtpPort', parseInt(e.target.value))}
-                  disabled={!settings.enableEmailNotifications}
+                  disabled={!settings.enableEmailNotifications || isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -1098,7 +1154,7 @@ const SettingsPage = () => {
                   label="SMTP Username"
                   value={settings.smtpUsername}
                   onChange={(e) => handleSettingChange('smtpUsername', e.target.value)}
-                  disabled={!settings.enableEmailNotifications}
+                  disabled={!settings.enableEmailNotifications || isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -1108,7 +1164,7 @@ const SettingsPage = () => {
                   type="password"
                   value={settings.smtpPassword}
                   onChange={(e) => handleSettingChange('smtpPassword', e.target.value)}
-                  disabled={!settings.enableEmailNotifications}
+                  disabled={!settings.enableEmailNotifications || isDemoModeRestricted}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -1117,7 +1173,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.smtpSecure}
                       onChange={(e) => handleSettingChange('smtpSecure', e.target.checked)}
-                      disabled={!settings.enableEmailNotifications}
+                      disabled={!settings.enableEmailNotifications || isDemoModeRestricted}
                     />
                   }
                   label="Use Secure Connection (TLS)"

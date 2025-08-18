@@ -165,8 +165,15 @@ router.get('/me', auth, async (req, res) => {
  */
 router.get('/config', (req, res) => {
   try {
+    const isDemoMode = process.env.DEMO_MODE === 'true';
+    
     res.json({
-      demoMode: process.env.DEMO_MODE === 'true'
+      demoMode: isDemoMode,
+      defaultAiProvider: isDemoMode ? {
+        type: 'google',
+        model: 'gemini-1.5-flash',
+        enabled: true
+      } : null
     });
   } catch (err) {
     console.error(err.message);

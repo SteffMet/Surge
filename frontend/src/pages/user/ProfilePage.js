@@ -68,10 +68,11 @@ import moment from 'moment';
 import { useAuth } from '../../services/AuthContext';
 import { authAPI, searchAPI, documentsAPI, handleApiError } from '../../services/api';
 import AiProviderSettings from '../../components/user/AiProviderSettings';
+import { shouldEnforceDemoMode } from '../../utils/superUser';
 
 const ProfilePage = () => {
   const theme = useTheme();
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, demoMode } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
@@ -295,6 +296,8 @@ const ProfilePage = () => {
 
   const getRoleColor = (role) => {
     switch (role) {
+      case 'super':
+        return 'secondary';
       case 'admin':
         return 'error';
       case 'basic-upload':
@@ -306,6 +309,8 @@ const ProfilePage = () => {
 
   const getRoleLabel = (role) => {
     switch (role) {
+      case 'super':
+        return 'Super Administrator';
       case 'admin':
         return 'Administrator';
       case 'basic-upload':
@@ -709,16 +714,26 @@ const ProfilePage = () => {
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
                         Keep your account secure with a strong password. We recommend using at least 8 characters with a mix of letters, numbers, and symbols.
                       </Typography>
+                      {shouldEnforceDemoMode(user, demoMode) && (
+                        <Alert severity="info" sx={{ mb: 2 }}>
+                          Password changes are disabled in demo mode
+                        </Alert>
+                      )}
                       <Button
                         variant="outlined"
                         startIcon={<LockIcon />}
                         onClick={() => setPasswordDialog(true)}
+                        disabled={shouldEnforceDemoMode(user, demoMode)}
                         fullWidth
                         size={isMobile ? "small" : "medium"}
                         sx={{
                           borderRadius: 3,
                           textTransform: 'none',
                           fontWeight: 600,
+                          ...(shouldEnforceDemoMode(user, demoMode) && {
+                            opacity: 0.5,
+                            cursor: 'not-allowed'
+                          })
                         }}
                       >
                         Change Password

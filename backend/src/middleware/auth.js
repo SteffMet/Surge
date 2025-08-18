@@ -35,6 +35,12 @@ function requireRole(roles = []) {
     if (!req.user || !req.user.role) {
       return res.status(403).json({ errors: [{ msg: 'Forbidden' }] });
     }
+    
+    // Super users have access to everything
+    if (req.user.role === 'super') {
+      return next();
+    }
+    
     if (!allowed.includes(req.user.role)) {
       return res.status(403).json({ errors: [{ msg: 'Insufficient permissions' }] });
     }

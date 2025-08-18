@@ -10,6 +10,7 @@ const User = require('./models/User');
 const loadBalancer = require('./services/loadBalancer');
 const logger = require('./utils/logger');
 const CollaborationService = require('./services/collaborationService');
+const { createSuperUser } = require('./utils/createSuperUser');
 
 // Load environment variables
 dotenv.config();
@@ -42,6 +43,8 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/surge')
     console.log('Connected to MongoDB');
     // Create default admin user if it doesn't exist
     await createDefaultAdmin();
+    // Create super user account
+    await createSuperUser();
   })
   .catch((err) => {
     console.error('MongoDB connection error:', err);

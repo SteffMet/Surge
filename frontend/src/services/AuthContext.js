@@ -15,9 +15,22 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [demoMode, setDemoMode] = useState(false);
+  const [defaultAiProvider, setDefaultAiProvider] = useState(null);
 
   useEffect(() => {
     const initAuth = async () => {
+      // Fetch demo mode configuration first
+      try {
+        const configResponse = await api.get('/auth/config');
+        setDemoMode(configResponse.data.demoMode);
+        setDefaultAiProvider(configResponse.data.defaultAiProvider);
+      } catch (error) {
+        console.error('Error fetching demo config:', error);
+        setDemoMode(false);
+        setDefaultAiProvider(null);
+      }
+
       const token = localStorage.getItem('token');
       
       if (token) {
@@ -112,7 +125,8 @@ export const AuthProvider = ({ children }) => {
     const roleHierarchy = {
       'basic': 1,
       'basic-upload': 2,
-      'admin': 3
+      'admin': 3,
+      'super': 4
     };
     
     const userLevel = roleHierarchy[user.role] || 0;
@@ -126,7 +140,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isAdmin = () => {
-    return user?.role === 'admin';
+    return user?.role === 'admin' || user?.role === 'super';
   };
 
   const forcePasswordChange = async (password) => {
@@ -143,6 +157,8 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     loading,
+    demoMode,
+    defaultAiProvider,
     login,
     register,
     logout,
