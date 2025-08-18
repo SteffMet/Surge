@@ -351,8 +351,8 @@ const LoginPage = () => {
                   left: 0,
                   right: 0,
                   height: 4,
-                                        background: theme.custom?.gradients?.primary,
-                                      }
+                  background: theme.custom?.gradients?.primary || 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                }
               }}
             >
               <CardContent sx={{ p: { xs: 4, sm: 6 } }}>
@@ -369,8 +369,8 @@ const LoginPage = () => {
                       width: 64,
                       height: 64,
                       borderRadius: 3,
-                                                background: theme.custom?.gradients?.primary,
-                                                display: 'flex',
+                      background: theme.custom?.gradients?.primary || 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                      display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: 'white',
@@ -549,9 +549,9 @@ const LoginPage = () => {
                       fontSize: '1.1rem',
                       fontWeight: 700,
                       borderRadius: theme.shape.borderRadius,
-                                                textTransform: 'none',
-                                                background: theme.custom?.gradients?.primary,
-                                                boxShadow: `0 8px 32px ${theme.palette.primary.main}4D`,
+                      textTransform: 'none',
+                      background: theme.custom?.gradients?.primary || 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                      boxShadow: `0 8px 32px ${theme.palette.primary.main}4D`,
                       '&:hover': {
                         transform: 'translateY(-2px)',
                         boxShadow: '0 12px 40px rgba(37, 99, 235, 0.4)',

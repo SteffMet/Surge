@@ -3,6 +3,62 @@
 ## Introduction
 This guide is intended for administrators of Surge. It covers advanced configuration, maintenance, and troubleshooting tasks.
 
+## Docker Administration
+
+### Container Management
+When running Surge with Docker, all services are managed through Docker Compose:
+
+```bash
+# View container status
+docker compose ps
+
+# View service logs
+docker compose logs [service_name]
+# Services: frontend, backend, mongodb, ollama
+
+# Restart specific service
+docker compose restart [service_name]
+
+# Stop all services
+docker compose down
+
+# Start services
+docker compose up -d
+```
+
+### Data Persistence
+Surge uses Docker volumes for data persistence:
+- **surge-mongo-data**: MongoDB database data
+- **surge-document-storage**: Document storage
+- **surge-ollama-models**: AI models
+
+```bash
+# View volumes
+docker volume ls | grep surge
+
+# Backup volumes
+docker run --rm -v surge-mongo-data:/data -v $(pwd):/backup busybox tar czf /backup/mongo-backup.tar.gz /data
+docker run --rm -v surge-document-storage:/data -v $(pwd):/backup busybox tar czf /backup/documents-backup.tar.gz /data
+```
+
+### Resource Monitoring
+Monitor resource usage:
+```bash
+# View resource usage
+docker stats
+
+# View container details
+docker compose top
+```
+
+### Configuration Updates
+After modifying configuration files:
+```bash
+# Rebuild and restart
+docker compose down
+docker compose up --build -d
+```
+
 ## Initial Setup
 
 ### First-time Login
