@@ -1,0 +1,42 @@
+{
+  "mcpServers": {
+    "serena": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena.git",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "ide-assistant"
+      ],
+      "disabled": true,
+      "alwaysAllow": [
+        "*",
+        "list_dir",
+        "find_file",
+        "search_for_pattern",
+        "get_symbols_overview",
+        "find_symbol",
+        "find_referencing_symbols",
+        "replace_symbol_body",
+        "read_memory",
+        "write_memory",
+        "insert_before_symbol",
+        "delete_memory",
+        "list_memories",
+        "insert_after_symbol",
+        "onboarding",
+        "check_onboarding_performed",
+        "think_about_task_adherence",
+        "activate_project",
+        "think_about_whether_you_are_done",
+        "think_about_collected_information"
+      ],
+      "disabledTools": [],
+      "env": {
+        "SERENA_PROJECT_PATH": "c:\\Projects\\BitSurge\\Surge"
+      }
+    }
+  }
+}

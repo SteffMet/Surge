@@ -1,0 +1,63 @@
+.content-suggestions-panel {
+  background: var(--mui-palette-background-paper, rgba(255, 255, 255, 0.98));
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--mui-palette-divider, rgba(229, 231, 235, 0.8));
+}
+
+.content-suggestions-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content-suggestions-panel::-webkit-scrollbar-track {
+  background: var(--mui-palette-grey-100, #f1f1f1);
+  border-radius: 3px;
+}
+
+.content-suggestions-panel::-webkit-scrollbar-thumb {
+  background: var(--mui-palette-grey-300, #c1c1c1);
+  border-radius: 3px;
+}
+
+.content-suggestions-panel::-webkit-scrollbar-thumb:hover {
+  background: var(--mui-palette-grey-400, #a8a8a8);
+}
+
+/* Animation for suggestions appearing */
+.content-suggestion-item {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Quality score animations */
+.quality-score-circle {
+  transition: all 0.3s ease;
+}
+
+.quality-score-circle:hover {
+  transform: scale(1.05);
+}
+
+/* Improvement severity indicators */
+.severity-high {
+  border-left-color: var(--mui-palette-error-main, #ef4444) !important;
+}
+
+.severity-medium {
+  border-left-color: var(--mui-palette-warning-main, #f59e0b) !important;
+}
+
+.severity-low {
+  border-left-color: var(--mui-palette-primary-main, #3b82f6) !important;
+}
+
+/* Dark mode support */

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Offline - Surge Documentation</title>
+    <link rel="icon" href="/favicon.ico" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 500px;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: #4a5568;
+        }
+
+        .features {
+            text-align: left;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .features h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .features ul {
+            list-style: none;
+        }
+
+        .features li {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #4a5568;
+        }
+
+        .features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .status {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(245, 101, 101, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(245, 101, 101, 0.3);
+        }
+
+        .status.online {
+            background: rgba(72, 187, 120, 0.1);
+            border-color: rgba(72, 187, 120, 0.3);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #f56565;
+            margin-right: 8px;
+        }
+
+        .status.online .status-indicator {
+            background: #48bb78;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .icon {
+                font-size: 3rem;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon pulse">📡</div>
+        <h1>You're Offline</h1>
+        <p>Don't worry! You can still access previously viewed documents and use many features while offline.</p>
+        
+        <div class="features">
+            <h3>Available Offline:</h3>
+            <ul>
+                <li>View cached documents and workspaces</li>
+                <li>Create and edit documents locally</li>
+                <li>Browse saved templates</li>
+                <li>Search through cached content</li>
+                <li>Access bookmarked pages</li>
+            </ul>
+        </div>
+
+        <div class="status" id="connectionStatus">
+            <span class="status-indicator"></span>
+            <span id="statusText">Offline - Checking connection...</span>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <button class="button" onclick="checkConnection()">Check Connection</button>
+            <a href="/" class="button" style="margin-left: 1rem;">Go to App</a>
+        </div>
+    </div>
+
+    <script>
+        function updateConnectionStatus() {
+            const status = document.getElementById('connectionStatus');
+            const statusText = document.getElementById('statusText');
+            
+            if (navigator.onLine) {
+                status.className = 'status online';
+                statusText.textContent = 'Back online! Your changes will sync automatically.';
+            } else {
+                status.className = 'status';
+                statusText.textContent = 'Still offline - Your work is being saved locally.';
+            }
+        }
+
+        function checkConnection() {
+            updateConnectionStatus();
+            
+            // Try to fetch a small resource to verify actual connectivity
+            fetch('/favicon.ico', { 
+                method: 'HEAD',
+                mode: 'no-cors',
+                cache: 'no-cache'
+            })
+            .then(() => {
+                if (navigator.onLine) {
+                    // Redirect to main app if we're truly back online
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                }
+            })
+            .catch(() => {
+                document.getElementById('statusText').textContent = 'Connection check failed - Still offline';
+            });
+        }
+
+        // Listen for online/offline events
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+
+        // Initial status check
+        updateConnectionStatus();
+        
+        // Auto-check connection every 30 seconds
+        setInterval(checkConnection, 30000);
+
+        // Auto-redirect if we detect we're online
+        if (navigator.onLine) {
+            fetch('/', { method: 'HEAD', mode: 'no-cors' })
+                .then(() => {
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                })
+                .catch(() => {
+                    console.log('App not available, staying on offline page');
+                });
+        }
+    </script>
+</body>
+</html>

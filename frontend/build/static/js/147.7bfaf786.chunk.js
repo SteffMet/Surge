@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunksurge_frontend=self.webpackChunksurge_frontend||[]).push([[147],{74147:(e,r,s)=>{s.d(r,{createInfoServices:()=>n.v});var n=s(35863);s(14455)}}]);

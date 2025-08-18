@@ -1,0 +1,126 @@
+.offline-status {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.status-banner {
+  background: var(--mui-palette-primary-main, #3b82f6);
+  color: var(--mui-palette-common-white, white);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.3s ease-out;
+}
+
+.status-banner.offline {
+  background: var(--mui-palette-warning-main, #f59e0b);
+}
+
+.status-banner.syncing {
+  background: var(--mui-palette-info-main, #3b82f6);
+}
+
+.status-banner.sync-result.success {
+  background: var(--mui-palette-success-main, #10b981);
+}
+
+.status-banner.sync-result.warning {
+  background: var(--mui-palette-warning-main, #f59e0b);
+}
+
+.status-banner.update-available {
+  background: var(--mui-palette-secondary-main, #8b5cf6);
+}
+
+.status-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.status-icon {
+  font-size: 16px;
+}
+
+.status-text {
+  flex: 1;
+  text-align: center;
+}
+
+.sync-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.update-btn,
+.sync-retry-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.update-btn:hover,
+.sync-retry-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.sync-retry-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .status-content {
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+  }
+
+  .status-text {
+    font-size: 12px;
+  }
+
+  .update-btn,
+  .sync-retry-btn {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+}

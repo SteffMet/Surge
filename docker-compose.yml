@@ -1,0 +1,97 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: surge-mongodb
+    volumes:
+      - surge-mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - surge-network
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: surge-ollama
+    volumes:
+      - surge-ollama-models:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - surge-network
+    restart: unless-stopped
+    environment:
+      OLLAMA_KEEP_ALIVE: 1s
+      NUM_THREAD: 8
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: surge-backend
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - surge-document-storage:/app/storage
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+      - ollama
+    networks:
+      - surge-network
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      MONGO_URI: mongodb://mongodb:27017/surge
+      JWT_SECRET: your_jwt_secret_key_change_this_in_production
+      JWT_EXPIRATION: 24h
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_MODEL: tinyllama:latest
+      EMBEDDING_MODEL: nomic-embed-text
+      EMBEDDING_DIM: 0
+      # Demo mode - set to true to show demo login credentials
+      DEMO_MODE: true
+      # Centralized timeout configuration with proper hierarchy
+      # Frontend API: 30s > Backend AI: 25s > Ollama Service: 20s > Health Check: 5s
+      OLLAMA_HEALTH_CHECK_TIMEOUT_MS: 5000
+      OLLAMA_SERVICE_TIMEOUT_MS: 20000
+      OLLAMA_MODEL_LOADING_TIMEOUT_MS: 60000
+      OLLAMA_MODEL_PULL_TIMEOUT_MS: 600000
+      SEARCH_AI_TIMEOUT_MS: 250000
+      # Retry configuration
+      OLLAMA_MAX_RETRIES: 15
+      OLLAMA_RETRY_BASE_DELAY_MS: 1000
+      OLLAMA_RETRY_MAX_DELAY_MS: 10000
+      STORAGE_PATH: /app/storage
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: http://localhost:3000/api
+    container_name: surge-frontend
+    volumes:
+      # Removed source bind mount so production build assets are served.
+      - /app/node_modules
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - surge-network
+    restart: unless-stopped
+
+networks:
+  surge-network:
+    driver: bridge
+
+volumes:
+  surge-mongo-data:
+  surge-ollama-models:
+  surge-document-storage:

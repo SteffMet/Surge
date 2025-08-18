@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="102" fill="#0F172A"/>
+  <circle cx="256" cy="256" r="192" stroke="url(#grad1)" stroke-width="34" stroke-linecap="round" stroke-dasharray="1200" stroke-dashoffset="240"/>
+  <path d="M288 78C293 78 298 81 302 86L405 261C410 271 407 284 398 291L302 357C297 361 291 364 285 364H227C216 364 207 355 207 344V168C207 157 216 148 227 148H288V78Z" fill="url(#grad2)"/>
+  <path d="M240 272L294 195L289 248H376L240 393L278 298H216L240 272Z" fill="#ffffff" fill-opacity="0.95"/>
+  <rect x="384" y="78" width="34" height="34" rx="8.5" fill="#2B6CB0"/>
+  <rect x="430" y="128" width="26" height="26" rx="6.5" fill="#3B82F6"/>
+  <defs>
+    <linearGradient id="grad1" x1="64" y1="64" x2="448" y2="448" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1D4ED8"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="grad2" x1="207" y1="78" x2="405" y2="364" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#6366F1"/>
+    </linearGradient>
+  </defs>
+</svg>

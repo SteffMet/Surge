@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunksurge_frontend=self.webpackChunksurge_frontend||[]).push([[297],{41297:(e,r,s)=>{s.d(r,{createArchitectureServices:()=>c.S});var c=s(54564);s(14455)}}]);

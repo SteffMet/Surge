@@ -1,0 +1,200 @@
+.pwa-install-prompt {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999;
+  animation: slideUp 0.3s ease-out;
+}
+
+.install-card {
+  background: var(--mui-palette-background-paper, white);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  max-width: 320px;
+  overflow: hidden;
+  border: 1px solid var(--mui-palette-divider, #e5e7eb);
+}
+
+.install-header {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  gap: 12px;
+  position: relative;
+}
+
+.install-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.install-title {
+  flex: 1;
+}
+
+.install-title h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--mui-palette-text-primary, #1f2937);
+}
+
+.install-title p {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: var(--mui-palette-text-secondary, #6b7280);
+  line-height: 1.4;
+}
+
+.dismiss-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  color: var(--mui-palette-text-disabled, #9ca3af);
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.dismiss-btn:hover {
+  background: var(--mui-palette-action-hover, #f3f4f6);
+  color: var(--mui-palette-text-secondary, #6b7280);
+}
+
+.install-features {
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--mui-palette-text-secondary, #6b7280);
+  padding: 4px 0;
+}
+
+.feature-icon {
+  font-size: 14px;
+}
+
+.install-actions {
+  padding: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.install-btn {
+  flex: 1;
+  background: var(--mui-palette-primary-main, #3b82f6);
+  color: var(--mui-palette-common-white, white);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.install-btn:hover:not(:disabled) {
+  background: var(--mui-palette-primary-dark, #2563eb);
+}
+
+.install-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.install-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.not-now-btn {
+  background: none;
+  border: 1px solid var(--mui-palette-grey-300, #d1d5db);
+  color: var(--mui-palette-text-secondary, #6b7280);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.not-now-btn:hover {
+  background: var(--mui-palette-grey-50, #f9fafb);
+  border-color: var(--mui-palette-grey-400, #9ca3af);
+  color: var(--mui-palette-text-primary, #374151);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .pwa-install-prompt {
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+  }
+
+  .install-card {
+    max-width: none;
+  }
+
+  .install-features {
+    grid-template-columns: 1fr;
+  }
+
+  .install-actions {
+    flex-direction: column;
+  }
+
+  .install-btn {
+    order: 2;
+  }
+
+  .not-now-btn {
+    order: 1;
+  }
+}
+
+/* Dark mode support */
