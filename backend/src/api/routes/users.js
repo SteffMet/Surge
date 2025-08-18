@@ -7,6 +7,7 @@ const auth = require('../../middleware/auth');
 const { requireRole } = require('../../middleware/auth');
 const User = require('../../models/User');
 const logger = require('../../utils/logger');
+const { shouldEnforceDemoMode } = require('../../utils/superUser');
 
 /**
  * @route   GET /api/users
@@ -75,10 +76,17 @@ router.post('/',
     body('username', 'Username is required').not().isEmpty().trim(),
     body('email', 'Please include a valid email').isEmail().normalizeEmail(),
     body('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
-    body('role', 'Role is required').isIn(['basic', 'basic-upload', 'admin'])
+    body('role', 'Role is required').isIn(['basic', 'basic-upload', 'admin', 'super'])
   ],
   async (req, res) => {
     try {
+      // Check if demo mode is enabled (unless user is super user)
+      if (shouldEnforceDemoMode(req.user)) {
+        return res.status(403).json({ 
+          errors: [{ msg: 'User creation is disabled in demo mode' }] 
+        });
+      }
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
@@ -266,6 +274,13 @@ router.put('/:id/password',
   ],
   async (req, res) => {
     try {
+      // Check if demo mode is enabled (unless user is super user)
+      if (shouldEnforceDemoMode(req.user)) {
+        return res.status(403).json({ 
+          errors: [{ msg: 'Password changes are disabled in demo mode' }] 
+        });
+      }
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });

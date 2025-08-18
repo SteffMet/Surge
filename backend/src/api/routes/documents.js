@@ -13,6 +13,7 @@ const Document = require('../../models/Document');
 const documentProcessor = require('../../services/documentProcessor');
 const embeddingService = require('../../services/embeddingService');
 const logger = require('../../utils/logger');
+const { shouldEnforceDemoMode } = require('../../utils/superUser');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -124,6 +125,13 @@ router.post('/upload',
   },
   async (req, res) => {
     try {
+      // Check if demo mode is enabled (unless user is super user)
+      if (shouldEnforceDemoMode(req.user)) {
+        return res.status(403).json({ 
+          errors: [{ msg: 'File uploads are disabled in demo mode' }] 
+        });
+      }
+
       console.log('Upload request received');
       console.log('File:', req.file);
       console.log('Body:', req.body);
@@ -188,6 +196,13 @@ router.post('/upload-zip',
   upload.single('zipfile'),
   async (req, res) => {
     try {
+      // Check if demo mode is enabled (unless user is super user)
+      if (shouldEnforceDemoMode(req.user)) {
+        return res.status(403).json({ 
+          errors: [{ msg: 'File uploads are disabled in demo mode' }] 
+        });
+      }
+
       if (!req.file || req.file.mimetype !== 'application/zip') {
         return res.status(400).json({ errors: [{ msg: 'Please upload a ZIP file' }] });
       }
