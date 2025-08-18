@@ -237,7 +237,7 @@ const Home = () => {
                   sx={{
                     fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem' },
                     fontWeight: 800,
-                    background: theme.custom?.gradients?.primary,
+                    background: theme.custom?.gradients?.primary || 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -317,7 +317,7 @@ const Home = () => {
                           px: { xs: 2, sm: 3 },
                           py: { xs: 1, sm: 1.5 },
                           minWidth: { xs: 80, sm: 100 },
-                          background: theme.custom?.gradients?.primary,
+                          background: theme.custom?.gradients?.primary || 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
                           textTransform: 'none',
                           fontWeight: 600,
                           '&:hover': {

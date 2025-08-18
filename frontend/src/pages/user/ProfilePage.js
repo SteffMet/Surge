@@ -331,7 +331,9 @@ const ProfilePage = () => {
             sx={{ 
               fontWeight: 800, 
               mb: 1,
-              background: theme.custom?.gradients?.primary || 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+              background: (theme.custom && theme.custom.gradients && theme.custom.gradients.primary) 
+                ? theme.custom.gradients.primary 
+                : 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -577,7 +579,9 @@ const ProfilePage = () => {
                       sx={{
                         borderRadius: 3,
                         textTransform: 'none',
-                        background: theme.custom?.gradients?.primary || 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                        background: (theme.custom && theme.custom.gradients && theme.custom.gradients.primary) 
+                          ? theme.custom.gradients.primary 
+                          : 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
                       }}
                     >
                       {saving ? 'Saving...' : 'Save Changes'}
@@ -823,7 +827,9 @@ const ProfilePage = () => {
                   sx={{
                     borderRadius: 3,
                     textTransform: 'none',
-                    background: theme.custom?.gradients?.primary || 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                    background: (theme.custom && theme.custom.gradients && theme.custom.gradients.primary) 
+                      ? theme.custom.gradients.primary 
+                      : 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
                   }}
                 >
                   {saving ? 'Saving...' : 'Save Preferences'}
@@ -1187,7 +1193,9 @@ const ProfilePage = () => {
             sx={{
               borderRadius: 3,
               textTransform: 'none',
-              background: theme.custom?.gradients?.primary || 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+              background: (theme.custom && theme.custom.gradients && theme.custom.gradients.primary) 
+                ? theme.custom.gradients.primary 
+                : 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
             }}
           >
             {saving ? 'Changing...' : 'Change Password'}

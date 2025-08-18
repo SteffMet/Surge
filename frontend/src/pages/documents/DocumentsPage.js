@@ -951,8 +951,8 @@ const DocumentsPage = () => {
                     borderRadius: 3,
                     textTransform: 'none',
                     fontWeight: 600,
-                                        background: theme.custom?.gradients?.primary,
-                                      }}
+                    background: theme.custom?.gradients?.primary || 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                  }}
                 >
                   Upload Documents
                 </Button>
@@ -1476,8 +1476,8 @@ const DocumentsPage = () => {
                 sx={{ 
                   borderRadius: 3,
                   px: 4,
-                                    background: theme.custom?.gradients?.primary,
-                                  }}
+                  background: theme.custom?.gradients?.primary || 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+                }}
               >
                 Upload Your First Document
               </Button>

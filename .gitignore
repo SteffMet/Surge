@@ -49,3 +49,15 @@ Thumbs.db
 
 # Ollama models
 /models
+
+# Temporary and cache files
+*.tmp
+*.temp
+*.cache
+.cache/
+
+# Test files
+test-*.js
+
+# Development (remove .serena and .github from ignore list as they should be preserved)
+/.vscode

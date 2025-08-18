@@ -10,7 +10,7 @@ const AuthLayout = ({ children }) => {
         overflow: 'auto', // Use auto for overflow
         m: 0,
         p: { xs: 2, sm: 3, md: 4 }, // Add padding for smaller screens
-        background: theme.custom?.gradients?.primary,
+        background: theme.custom?.gradients?.primary || 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
         // Apply the app gradient so there is never white gutter around the login page
         // Allow the inner LoginPage component to handle its own centering/styling
         display: 'flex',

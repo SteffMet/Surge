@@ -146,7 +146,8 @@ const WorkspacesPage = () => {
   };
 
   const handleMenuOpen = (event, workspace) => {
-    setAnchorEl(event.currentTarget.closest('.workspace-card'));
+    event.stopPropagation(); // Prevent event propagation
+    setAnchorEl(event.currentTarget);
     setSelectedWorkspace(workspace);
   };
 
@@ -912,12 +913,20 @@ const WorkspacesPage = () => {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleMenuClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
         PaperProps={{
           sx: {
             borderRadius: theme.shape.borderRadius,
-                        border: `1px solid ${theme.palette.divider}`,
-                        minWidth: 200,
-                        boxShadow: theme.custom.shadows.xl,
+            border: `1px solid ${theme.palette.divider}`,
+            minWidth: 200,
+            boxShadow: theme.custom.shadows.xl,
           }
         }}
       >
