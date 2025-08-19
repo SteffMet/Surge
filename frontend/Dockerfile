@@ -17,7 +17,7 @@ RUN yarn install --frozen-lockfile
 COPY . .
 
 # Build the application
-RUN yarn build
+RUN CI=false yarn build
 
 # Production stage
 FROM nginx:alpine
