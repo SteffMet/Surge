@@ -53,6 +53,7 @@ import {
   Speed as SpeedIcon,
 } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
+import AlertTitle from '@mui/material/AlertTitle';
 
 import { useAuth } from '../../services/AuthContext';
 import { documentsAPI, usersAPI, workspacesAPI } from '../../services/api';
