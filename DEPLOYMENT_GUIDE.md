@@ -57,10 +57,8 @@ BitSurge has been successfully transformed from a basic IT documentation search 
 
 1. **Access the Installation Wizard:**
    ```bash
-   # Option 1: Use hosted installer
-   open https://install.bitsurge.io
-   
-   # Option 2: Run local installer
+      
+   # Option 1: Run local installer
    docker run -p 3000:3000 bitsurge/installer:latest
    open http://localhost:3000/install
    ```
