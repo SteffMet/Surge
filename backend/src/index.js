@@ -72,6 +72,39 @@ const createDefaultAdmin = async () => {
       console.log('IMPORTANT: Change the default password after first login!');
     }
 
+    // Create superuser if credentials are provided in env vars
+    const superuserEmail = process.env.SUPERUSER_EMAIL;
+    const superuserPassword = process.env.SUPERUSER_PASSWORD;
+    const superuserName = process.env.SUPERUSER_NAME || 'Super Administrator';
+    
+    if (superuserEmail && superuserPassword) {
+      let superuser = await User.findOne({ email: superuserEmail });
+      
+      if (!superuser) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(superuserPassword, salt);
+        
+        superuser = new User({
+          username: superuserName.toLowerCase().replace(/\s+/g, ''),
+          email: superuserEmail,
+          password: hashedPassword,
+          role: 'superuser',
+          active: true
+        });
+
+        await superuser.save();
+        console.log('Superuser created:');
+        console.log(`Name: ${superuserName}`);
+        console.log(`Email: ${superuserEmail}`);
+        console.log('IMPORTANT: This user has full permissions even in demo mode!');
+      } else if (superuser.role !== 'superuser') {
+        // Update existing user to superuser if the email was provided
+        superuser.role = 'superuser';
+        await superuser.save();
+        console.log(`User ${superuserEmail} upgraded to superuser role`);
+      }
+    }
+
     // Create demo user if demo mode is enabled
     if (process.env.DEMO_MODE === 'true') {
       const existingUser = await User.findOne({ email: 'user@surge.local' });

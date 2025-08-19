@@ -75,13 +75,18 @@ router.post('/',
     body('username', 'Username is required').not().isEmpty().trim(),
     body('email', 'Please include a valid email').isEmail().normalizeEmail(),
     body('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
-    body('role', 'Role is required').isIn(['basic', 'basic-upload', 'admin'])
+    body('role', 'Role is required').isIn(['basic', 'basic-upload', 'admin', 'superuser'])
   ],
   async (req, res) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
+      }
+
+      // Check if demo mode is enabled
+      if (process.env.DEMO_MODE === 'true' && req.user.role !== 'superuser') {
+        return res.status(403).json({ errors: [{ msg: 'User creation is disabled in demo mode' }] });
       }
 
       const { username, email, password, role } = req.body;
@@ -166,7 +171,7 @@ router.put('/:id',
   [
     body('username').optional().trim().isLength({ min: 2 }),
     body('email').optional().isEmail().normalizeEmail(),
-    body('role').optional().isIn(['basic', 'basic-upload', 'admin']),
+    body('role').optional().isIn(['basic', 'basic-upload', 'admin', 'superuser']),
     body('active').optional().isBoolean(),
     body('externalAiProviderEnabled').optional().isBoolean(),
     body('externalAiApiKey').optional().isString(),
@@ -269,6 +274,11 @@ router.put('/:id/password',
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
+      }
+      
+      // Check if demo mode is enabled
+      if (process.env.DEMO_MODE === 'true' && req.user.role !== 'superuser') {
+        return res.status(403).json({ errors: [{ msg: 'Password changes are disabled in demo mode' }] });
       }
 
       const user = await User.findById(req.params.id);

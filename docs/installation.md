@@ -1,104 +1,219 @@
-# Surge - Installation Guide
+# BitSurge - Installation Guide
 
-Surge is an AI-powered document search and management platform built with React, Node.js, and Docker. This guide covers installation using Docker (recommended) and manual setup.
+BitSurge is an AI-powered document search and management platform built with React, Node.js, and Docker. This guide covers installation using Docker (recommended) and manual setup.
+
+## 🚀 Quick Start with Installation Wizard
+
+The easiest way to set up BitSurge is using our interactive installation wizard:
+
+1. **Access the installer** at `/install` in your browser
+2. **Follow the step-by-step configuration** wizard
+3. **Download the generated docker-compose.yml** file
+4. **Run Docker Compose** to start your instance
+
+The installer will help you configure:
+- Demo mode and basic settings
+- Superuser administrator account
+- AI provider selection (Google Gemini recommended)
+- Network ports and security settings
+
+Visit [bitsurge.io](https://bitsurge.io) for more information.
 
 ## Prerequisites
 - **Docker and Docker Compose** (Required for Docker installation)
-- **16GB+ RAM recommended** (Ollama AI models require significant memory)
-- **Internet connection** for pulling Docker images and Ollama models
-- **Git** for cloning the repository
+- **16GB+ RAM recommended** (Self-hosted AI models require significant memory)
+- **Internet connection** for pulling Docker images and AI API access
+- **Git** for cloning the repository (optional if using pre-built images)
 
 ## Docker Installation (Recommended)
 
-### 1. Clone the Repository
+### Method 1: Using Installation Wizard (Easiest)
+
+1. **Pull and run the installer:**
+```bash
+docker run -p 3000:3000 bitsurge/installer:latest
+```
+
+2. **Open your browser** and go to `http://localhost:3000/install`
+
+3. **Complete the configuration wizard** and download your custom docker-compose.yml
+
+4. **Start your configured instance:**
+```bash
+docker compose up -d
+```
+
+### Method 2: Using Pre-configured Docker Compose
+
+1. **Download the default configuration:**
+```bash
+curl -o docker-compose.yml https://raw.githubusercontent.com/steffmet/surge/main/docker-compose.yml
+```
+
+2. **Edit environment variables** (optional):
+```bash
+# Edit the docker-compose.yml file to configure:
+# - SUPERUSER_EMAIL and SUPERUSER_PASSWORD
+# - GOOGLE_API_KEY (for Google Gemini AI)
+# - DEMO_MODE (true/false)
+# - DEFAULT_AI_PROVIDER (google/self-hosted/openai/anthropic)
+```
+
+3. **Start the application:**
+```bash
+docker compose up -d
+```
+
+### Method 3: Clone and Build from Source
+
+1. **Clone the repository:**
 ```bash
 git clone https://github.com/steffmet/surge.git
 cd surge
 ```
 
-**Note:** The official repository is hosted at `github.com/steffmet/surge`
-
-### 2. Start the Application
-Run the complete Docker setup:
+2. **Start the application:**
 ```bash
 docker compose up -d
 ```
 
-This command will:
-- Pull necessary Docker images (Node.js, MongoDB, Ollama, Nginx)
-- Build the frontend and backend containers
-- Start all services (frontend, backend, MongoDB, Ollama)
-- Download the Ollama Mistral 7B model (first run only, ~4GB download)
+## 🔧 Configuration Options
 
-**First-time setup may take 10-15 minutes** due to Docker image downloads and AI model setup.
+### Demo Mode
+Demo mode restricts certain operations to showcase the platform safely:
+- File uploads disabled for regular users
+- User creation disabled
+- Password changes disabled
+- Settings page read-only
+- Only superuser can perform admin operations
 
-### 3. Monitor the Setup
-Check container status:
+Enable demo mode by setting `DEMO_MODE=true` in your environment variables.
+
+### AI Provider Configuration
+
+BitSurge supports multiple AI providers:
+
+#### Google Gemini (Recommended)
+- **Free tier available** with generous limits
+- **Fast response times** with Gemini Flash
+- **Easy setup** with just an API key
+
+```yaml
+environment:
+  DEFAULT_AI_PROVIDER: google
+  GOOGLE_API_KEY: your_api_key_here
+```
+
+Get your free API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
+
+#### Self-Hosted Ollama
+- **Completely free** and private
+- **No API costs** or usage limits
+- **Requires more system resources** (8GB+ RAM)
+
+```yaml
+environment:
+  DEFAULT_AI_PROVIDER: self-hosted
+  OLLAMA_HOST: http://ollama:11434
+```
+
+#### OpenAI
+```yaml
+environment:
+  DEFAULT_AI_PROVIDER: openai
+  OPENAI_API_KEY: your_api_key_here
+```
+
+#### Anthropic Claude
+```yaml
+environment:
+  DEFAULT_AI_PROVIDER: anthropic
+  ANTHROPIC_API_KEY: your_api_key_here
+```
+
+### Superuser Account
+Configure a superuser account with full permissions:
+
+```yaml
+environment:
+  SUPERUSER_EMAIL: admin@yourdomain.com
+  SUPERUSER_PASSWORD: YourSecurePassword123!
+  SUPERUSER_NAME: "System Administrator"
+```
+
+The superuser account can:
+- Access all features even in demo mode
+- Create and manage users
+- Modify system settings
+- Upload and manage documents
+- Create and manage workspaces
+
+## 📋 First-Time Setup
+
+### 1. Wait for Initialization
+First-time setup may take 5-10 minutes due to:
+- Docker image downloads
+- Database initialization
+- AI model downloads (if using self-hosted)
+
+### 2. Monitor Progress
 ```bash
+# Check container status
 docker compose ps
-```
 
-View logs if needed:
-```bash
+# View logs
 docker compose logs -f
+
+# Check specific service
+docker compose logs backend
 ```
 
-### 4. Access the Application
-Once all containers are running and healthy, access the application at:
+### 3. Access the Application
+Once ready, access BitSurge at:
 ```
 http://localhost
 ```
 
-**Default admin credentials:**
-- Username: `admin`
-- Password: `admin123`
+### 4. Login
+Use your configured superuser credentials or the default demo accounts:
 
-**⚠️ Security:** Change the default password immediately after first login.
+**Demo Mode Default Accounts:**
+- **Admin:** admin@surge.local / admin123
+- **User:** user@surge.local / user123
 
-## Manual Installation (Advanced)
+**⚠️ Security:** Change default passwords immediately in production!
 
-For development or custom deployment scenarios, you can install Surge manually without Docker.
+## 🛠 Manual Installation (Advanced)
+
+For development or custom deployment scenarios:
 
 ### Prerequisites
 - **Node.js 18+** with npm/yarn
-- **MongoDB 6.0+** running locally or accessible remotely
-- **Ollama** installed and running with Mistral 7B model
+- **MongoDB 6.0+** 
+- **Ollama** (if using self-hosted AI)
 
-### 1. Clone and Setup Backend
+### Backend Setup
 ```bash
 git clone https://github.com/steffmet/surge.git
 cd surge/backend
 npm install
 
-# Configure environment variables
+# Configure environment
 cp .env.example .env
-# Edit .env with your MongoDB connection string and settings
+# Edit .env with your settings
 
-# Start the backend
 npm run dev
 ```
 
-### 2. Setup Frontend
+### Frontend Setup
 ```bash
 cd ../frontend
 npm install
-
-# Build for production
-npm run build
-
-# For development
-npm run dev
+npm run build  # for production
+npm run dev    # for development
 ```
 
-### 3. Configure Ollama
-Install Ollama and pull the required model:
-```bash
-ollama pull mistral
-ollama serve
-```
-
-### 4. Setup Web Server (Production)
-For production, serve the built frontend with a web server like Nginx:
+### Web Server Configuration (Production)
 ```nginx
 server {
     listen 80;
@@ -120,137 +235,98 @@ server {
 }
 ```
 
-## Manual Configuration
+## 🔍 Troubleshooting
 
-### MongoDB Configuration
-MongoDB is configured with volume persistence by default. The data is stored in a Docker volume named `surge-mongo-data`.
-
-### Ollama Model Configuration
-The default model is Mistral 7B, which offers a good balance of performance and resource usage. To use a different model:
-
-1. Edit the `.env` file:
-```
-OLLAMA_MODEL=llama3
-```
-
-2. Restart the Ollama container:
-```bash
-docker-compose restart ollama
-```
-
-### Document Storage
-Documents are stored in a Docker volume named `surge-document-storage`. To use a different storage location:
-
-1. Edit the `docker-compose.yml` file to map a host directory:
-```yaml
-volumes:
-  - /path/on/host:/app/storage
-```
-
-2. Restart the application:
-```bash
-docker-compose down
-docker-compose up -d
-```
-
-## Troubleshooting
-
-### Common Docker Issues
-
-#### Container Startup Problems
-Check container status and logs:
-```bash
-# View all container status
-docker compose ps
-
-# View logs for all services
-docker compose logs
-
-# View logs for specific service
-docker compose logs frontend
-docker compose logs backend
-docker compose logs mongodb
-docker compose logs ollama
-```
+### Common Issues
 
 #### Port Conflicts
-If port 80 is already in use:
 ```bash
-# Check what's using port 80
+# Check port usage
 netstat -an | grep :80
-# or on Windows
-netstat -an | findstr :80
 
-# Edit docker-compose.yml to use different port
-# Change ports: "8080:80" instead of "80:80"
+# Use different ports in docker-compose.yml
+ports:
+  - "8080:80"  # Frontend
+  - "3001:3000"  # Backend
 ```
 
 #### Memory Issues
-Ollama requires significant RAM. If containers are killed due to memory:
 ```bash
-# Check Docker memory limits
+# Check Docker memory usage
 docker stats
 
-# Increase Docker Desktop memory allocation (Windows/Mac)
-# Docker Desktop > Settings > Resources > Memory > 8GB+
+# Increase Docker Desktop memory (8GB+ recommended)
 ```
 
-#### Ollama Model Download Issues
-If Ollama fails to download the model:
+#### AI Provider Issues
 ```bash
-# Check Ollama logs
-docker compose logs ollama
+# Test Google Gemini API
+curl -H "Authorization: Bearer YOUR_API_KEY" \
+  "https://generativelanguage.googleapis.com/v1/models"
 
-# Manually pull the model
-docker compose exec ollama ollama pull mistral
-
-# Verify model is available
+# Check Ollama status
 docker compose exec ollama ollama list
 ```
 
-### Docker Commands Reference
+#### Database Connection
+```bash
+# Check MongoDB logs
+docker compose logs mongodb
+
+# Verify connection
+docker compose exec backend npm run test:db
+```
+
+### Useful Commands
 
 ```bash
-# Stop all services
-docker compose down
+# Complete restart
+docker compose down && docker compose up -d
 
-# Rebuild and restart (after code changes)
-docker compose down
-docker compose up --build -d
+# Rebuild after changes
+docker compose down && docker compose up --build -d
 
-# View real-time logs
-docker compose logs -f
-
-# Reset everything (removes volumes)
+# Reset everything (removes data!)
 docker compose down -v
-docker compose up --build -d
 
-# Check resource usage
+# View resource usage
 docker stats
 
-# Clean up unused Docker resources
+# Clean up Docker
 docker system prune -f
 ```
 
-## Upgrading
+## 📈 Next Steps
+
+After installation:
+
+1. **🔐 Security:** Change default passwords and configure JWT secrets
+2. **📁 Test Upload:** Upload sample documents to verify functionality  
+3. **👥 User Management:** Create user accounts in Admin > Users
+4. **⚙️ System Settings:** Configure preferences in Admin > Settings
+5. **🤖 AI Testing:** Test search with AI-powered responses
+6. **💾 Backup Setup:** Configure backups for documents and database
+7. **📊 Monitoring:** Set up log monitoring and alerts
+
+## 🆘 Getting Help
+
+- **Documentation:** Visit [bitsurge.io](https://bitsurge.io) for comprehensive guides
+- **GitHub Issues:** [github.com/steffmet/surge/issues](https://github.com/steffmet/surge/issues)
+- **Community:** Join our community discussions
+- **Enterprise Support:** Contact us for enterprise deployment assistance
+
+## 🚀 Upgrading
+
 To upgrade to a newer version:
 
 ```bash
+# Pull latest changes
 git pull
-docker-compose down
-docker-compose build
-docker-compose up -d
-## Next Steps
 
-After successful installation:
-1. **Change default admin password** in Profile settings
-2. **Upload test documents** to verify search functionality
-3. **Configure user accounts** in Admin > Users
-4. **Customize settings** in Admin > Settings
-5. **Set up backups** for document storage and MongoDB data
+# Rebuild and restart
+docker compose down
+docker compose pull
+docker compose up --build -d
+```
 
-## Getting Help
-
-- **GitHub Issues:** [github.com/steffmet/surge/issues](https://github.com/steffmet/surge/issues)
-- **Documentation:** Check \docs/\ directory for more guides
-- **Logs:** Always check \docker compose logs\ for error details
+**Powered by [BitSurge.io](https://bitsurge.io) - AI-Powered Documentation Search**

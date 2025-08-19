@@ -25,6 +25,7 @@ import {
   Tooltip,
   Paper,
   Container,
+  Link,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -767,6 +768,39 @@ const Layout = ({ toggleMode, mode, children }) => {
         >
           {children || <Outlet />}
         </Container>
+        
+        {/* Footer */}
+        <Box
+          component="footer"
+          sx={{
+            mt: 'auto',
+            py: 2,
+            px: 3,
+            borderTop: `1px solid ${theme.palette.divider}`,
+            backgroundColor: 'background.paper',
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            Powered by{' '}
+            <Link
+              href="https://bitsurge.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                color: 'primary.main',
+                textDecoration: 'none',
+                fontWeight: 600,
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              BitSurge.io
+            </Link>
+            {' '}• AI-Powered Documentation Search
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );

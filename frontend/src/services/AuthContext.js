@@ -15,10 +15,20 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [demoMode, setDemoMode] = useState(false);
 
   useEffect(() => {
     const initAuth = async () => {
       const token = localStorage.getItem('token');
+      
+      // Check if demo mode is enabled
+      try {
+        const configResponse = await api.get('/auth/config');
+        setDemoMode(configResponse.data.demoMode);
+      } catch (error) {
+        console.error('Failed to get auth config:', error);
+        setDemoMode(false); // Default to false if error
+      }
       
       if (token) {
         try {
@@ -112,7 +122,8 @@ export const AuthProvider = ({ children }) => {
     const roleHierarchy = {
       'basic': 1,
       'basic-upload': 2,
-      'admin': 3
+      'admin': 3,
+      'superuser': 4
     };
     
     const userLevel = roleHierarchy[user.role] || 0;
@@ -122,11 +133,47 @@ export const AuthProvider = ({ children }) => {
   };
 
   const canUpload = () => {
+    // In demo mode, only superuser can upload
+    if (demoMode && user?.role !== 'superuser') {
+      return false;
+    }
+    
     return hasRole('basic'); // Changed from 'basic-upload' to 'basic' to match backend permissions
   };
 
+  const canCreateUser = () => {
+    // In demo mode, only superuser can create users
+    if (demoMode && user?.role !== 'superuser') {
+      return false;
+    }
+    
+    return hasRole('admin');
+  };
+
+  const canChangePassword = () => {
+    // In demo mode, only superuser can change password
+    if (demoMode && user?.role !== 'superuser') {
+      return false;
+    }
+    
+    return true;
+  };
+
+  const canCreateWorkspace = () => {
+    // In demo mode, only superuser can create workspaces
+    if (demoMode && user?.role !== 'superuser') {
+      return false;
+    }
+    
+    return true;
+  };
+
   const isAdmin = () => {
-    return user?.role === 'admin';
+    return user?.role === 'admin' || user?.role === 'superuser';
+  };
+
+  const isSuperuser = () => {
+    return user?.role === 'superuser';
   };
 
   const forcePasswordChange = async (password) => {
@@ -143,13 +190,18 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     loading,
+    demoMode,
     login,
     register,
     logout,
     updateUser,
     hasRole,
     canUpload,
+    canCreateUser,
+    canChangePassword,
+    canCreateWorkspace,
     isAdmin,
+    isSuperuser,
     forcePasswordChange,
   };
 

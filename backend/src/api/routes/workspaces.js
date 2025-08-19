@@ -91,6 +91,11 @@ router.post('/', [
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
+    
+    // Check if demo mode is enabled
+    if (process.env.DEMO_MODE === 'true' && req.user.role !== 'superuser') {
+      return res.status(403).json({ errors: [{ msg: 'Workspace creation is disabled in demo mode' }] });
+    }
 
     const { name, description, type, tags, settings } = req.body;
 

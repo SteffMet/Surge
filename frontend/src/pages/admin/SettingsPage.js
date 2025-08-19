@@ -58,13 +58,16 @@ import { useAuth } from '../../services/AuthContext';
 import { documentsAPI, usersAPI, workspacesAPI } from '../../services/api';
 
 const SettingsPage = () => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isSuperuser, demoMode } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [confirmDialog, setConfirmDialog] = useState({ open: false, action: null, title: '', message: '' });
+  
+  // Determine if settings are read-only based on demo mode and user role
+  const isReadOnly = demoMode && !isSuperuser();
 
   // Settings state
   const [settings, setSettings] = useState({
@@ -424,12 +427,28 @@ const SettingsPage = () => {
             variant="contained"
             startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
             onClick={handleSaveSettings}
-            disabled={saving}
+            disabled={saving || isReadOnly}
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </Box>
       </Box>
+      
+      {/* Demo Mode Warning */}
+      {isReadOnly && (
+        <Alert 
+          severity="info" 
+          sx={{ mb: 4 }}
+          action={
+            <Button color="inherit" size="small">
+              Learn More
+            </Button>
+          }
+        >
+          <AlertTitle>Settings are read-only in Demo Mode</AlertTitle>
+          In demo mode, settings can only be viewed but not changed. Only superuser accounts can modify settings in demo mode.
+        </Alert>
+      )}
 
       {/* System Status */}
       <Paper sx={{ p: 3, mb: 4 }}>
@@ -511,6 +530,7 @@ const SettingsPage = () => {
                   label="Site Name"
                   value={settings.siteName}
                   onChange={(e) => handleSettingChange('siteName', e.target.value)}
+                  disabled={isReadOnly}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -520,6 +540,7 @@ const SettingsPage = () => {
                     value={settings.defaultUserRole}
                     onChange={(e) => handleSettingChange('defaultUserRole', e.target.value)}
                     label="Default User Role"
+                    disabled={isReadOnly}
                   >
                     <MenuItem value="basic">Basic</MenuItem>
                     <MenuItem value="basic-upload">Basic + Upload</MenuItem>
@@ -534,6 +555,7 @@ const SettingsPage = () => {
                   rows={2}
                   value={settings.siteDescription}
                   onChange={(e) => handleSettingChange('siteDescription', e.target.value)}
+                  disabled={isReadOnly}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -542,6 +564,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.maintenanceMode}
                       onChange={(e) => handleSettingChange('maintenanceMode', e.target.checked)}
+                      disabled={isReadOnly}
                     />
                   }
                   label="Maintenance Mode"
@@ -553,6 +576,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.allowRegistration}
                       onChange={(e) => handleSettingChange('allowRegistration', e.target.checked)}
+                      disabled={isReadOnly}
                     />
                   }
                   label="Allow User Registration"
@@ -576,6 +600,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.searchResultsPerPage}
                   onChange={(e) => handleSettingChange('searchResultsPerPage', parseInt(e.target.value))}
+                  disabled={isReadOnly}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -585,6 +610,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.maxSearchResults}
                   onChange={(e) => handleSettingChange('maxSearchResults', parseInt(e.target.value))}
+                  disabled={isReadOnly}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -593,6 +619,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.enableAutoComplete}
                       onChange={(e) => handleSettingChange('enableAutoComplete', e.target.checked)}
+                      disabled={isReadOnly}
                     />
                   }
                   label="Enable Auto-complete"
@@ -604,6 +631,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.enableSearchSuggestions}
                       onChange={(e) => handleSettingChange('enableSearchSuggestions', e.target.checked)}
+                      disabled={isReadOnly}
                     />
                   }
                   label="Enable Search Suggestions"
@@ -624,6 +652,7 @@ const SettingsPage = () => {
                       checked={settings.enableAISearch}
                       onChange={(e) => handleSettingChange('enableAISearch', e.target.checked)}
                       color="primary"
+                      disabled={isReadOnly}
                     />
                   }
                   label={
@@ -649,7 +678,7 @@ const SettingsPage = () => {
                     value={settings.aiProviderType || 'self-hosted'}
                     onChange={(e) => handleSettingChange('aiProviderType', e.target.value)}
                     label="AI Provider Type"
-                    disabled={!settings.enableAISearch}
+                    disabled={!settings.enableAISearch || isReadOnly}
                     sx={{
                       '& .MuiOutlinedInput-notchedOutline': {
                         borderColor: settings.enableAISearch ? 'primary.main' : 'divider'
@@ -724,6 +753,7 @@ const SettingsPage = () => {
                       onChange={(e) => handleSettingChange('externalApiKey', e.target.value)}
                       placeholder="Enter your API key here"
                       sx={{ mb: 2 }}
+                      disabled={isReadOnly}
                       helperText={
                         settings.aiProviderType === 'openai' ? 'Get your API key from https://platform.openai.com/api-keys' :
                         settings.aiProviderType === 'google' ? 'Get your API key from Google AI Studio' :
@@ -752,6 +782,7 @@ const SettingsPage = () => {
                         placeholder="https://your-resource.openai.azure.com"
                         sx={{ mb: 2 }}
                         helperText="Your Azure OpenAI service endpoint URL"
+                        disabled={isReadOnly}
                       />
                     )}
                     
@@ -765,6 +796,7 @@ const SettingsPage = () => {
                       placeholder="You are a helpful IT assistant for documentation search..."
                       sx={{ mb: 2 }}
                       helperText="Override the default system prompt for AI responses"
+                      disabled={isReadOnly}
                     />
                   </>
                 )}
@@ -785,6 +817,7 @@ const SettingsPage = () => {
                       value={settings.ollamaEndpoint}
                       onChange={(e) => handleSettingChange('ollamaEndpoint', e.target.value)}
                       helperText="Default: http://localhost:11434"
+                      disabled={isReadOnly}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
@@ -805,6 +838,7 @@ const SettingsPage = () => {
                         value={settings.ollamaModel}
                         onChange={(e) => handleSettingChange('ollamaModel', e.target.value)}
                         label="AI Model"
+                        disabled={isReadOnly}
                       >
                         <MenuItem value="mistral">Mistral 7B (Recommended)</MenuItem>
                         <MenuItem value="llama2">Llama 2</MenuItem>
@@ -822,6 +856,7 @@ const SettingsPage = () => {
                         label="Custom Model Name"
                         placeholder="Enter custom Ollama model name"
                         helperText="Enter the exact name of your custom Ollama model"
+                        disabled={isReadOnly}
                       />
                     </Grid>
                   )}
@@ -833,6 +868,7 @@ const SettingsPage = () => {
                       value={settings.maxTokens}
                       onChange={(e) => handleSettingChange('maxTokens', parseInt(e.target.value))}
                       helperText="Maximum response length"
+                      disabled={isReadOnly}
                     />
                   </Grid>
                   <Grid item xs={12} md={6}>
@@ -860,6 +896,7 @@ const SettingsPage = () => {
                           { value: 1, label: 'Creative' }
                         ]}
                         valueLabelDisplay="auto"
+                        disabled={isReadOnly}
                         sx={{
                           '& .MuiSlider-thumb': {
                             bgcolor: 'primary.main'
@@ -879,6 +916,7 @@ const SettingsPage = () => {
                       value={settings.aiResponseTimeout}
                       onChange={(e) => handleSettingChange('aiResponseTimeout', parseInt(e.target.value))}
                       helperText="How long to wait for AI responses before timing out"
+                      disabled={isReadOnly}
                     />
                   </Grid>
                 </>
@@ -901,6 +939,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.maxFileSize}
                   onChange={(e) => handleSettingChange('maxFileSize', parseInt(e.target.value))}
+                  disabled={isReadOnly}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -910,6 +949,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.maxFilesPerUpload}
                   onChange={(e) => handleSettingChange('maxFilesPerUpload', parseInt(e.target.value))}
+                  disabled={isReadOnly}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -918,6 +958,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.enableBulkUpload}
                       onChange={(e) => handleSettingChange('enableBulkUpload', e.target.checked)}
+                      disabled={isReadOnly}
                     />
                   }
                   label="Enable Bulk Upload"
@@ -929,6 +970,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.autoProcessDocuments}
                       onChange={(e) => handleSettingChange('autoProcessDocuments', e.target.checked)}
+                      disabled={isReadOnly}
                     />
                   }
                   label="Auto-process Documents"
@@ -949,6 +991,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.retentionPeriod}
                   onChange={(e) => handleSettingChange('retentionPeriod', parseInt(e.target.value))}
+                  disabled={isReadOnly}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -958,6 +1001,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.maxStorageSize}
                   onChange={(e) => handleSettingChange('maxStorageSize', parseInt(e.target.value))}
+                  disabled={isReadOnly}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -966,6 +1010,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.enableAutoCleanup}
                       onChange={(e) => handleSettingChange('enableAutoCleanup', e.target.checked)}
+                      disabled={isReadOnly}
                     />
                   }
                   label="Enable Auto Cleanup"
@@ -977,6 +1022,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.compressionEnabled}
                       onChange={(e) => handleSettingChange('compressionEnabled', e.target.checked)}
+                      disabled={isReadOnly}
                     />
                   }
                   label="Enable Compression"
@@ -1000,6 +1046,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.sessionTimeout}
                   onChange={(e) => handleSettingChange('sessionTimeout', parseInt(e.target.value))}
+                  disabled={isReadOnly}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -1009,6 +1056,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.passwordMinLength}
                   onChange={(e) => handleSettingChange('passwordMinLength', parseInt(e.target.value))}
+                  disabled={isReadOnly}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -1018,6 +1066,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.maxLoginAttempts}
                   onChange={(e) => handleSettingChange('maxLoginAttempts', parseInt(e.target.value))}
+                  disabled={isReadOnly}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -1027,6 +1076,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.lockoutDuration}
                   onChange={(e) => handleSettingChange('lockoutDuration', parseInt(e.target.value))}
+                  disabled={isReadOnly}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -1035,6 +1085,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.requireStrongPasswords}
                       onChange={(e) => handleSettingChange('requireStrongPasswords', e.target.checked)}
+                      disabled={isReadOnly}
                     />
                   }
                   label="Require Strong Passwords"
@@ -1046,6 +1097,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.enableTwoFactor}
                       onChange={(e) => handleSettingChange('enableTwoFactor', e.target.checked)}
+                      disabled={isReadOnly}
                     />
                   }
                   label="Enable Two-Factor Authentication"
@@ -1068,6 +1120,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.enableEmailNotifications}
                       onChange={(e) => handleSettingChange('enableEmailNotifications', e.target.checked)}
+                      disabled={isReadOnly}
                     />
                   }
                   label="Enable Email Notifications"
@@ -1079,7 +1132,7 @@ const SettingsPage = () => {
                   label="SMTP Server"
                   value={settings.smtpServer}
                   onChange={(e) => handleSettingChange('smtpServer', e.target.value)}
-                  disabled={!settings.enableEmailNotifications}
+                  disabled={!settings.enableEmailNotifications || isReadOnly}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -1089,7 +1142,7 @@ const SettingsPage = () => {
                   type="number"
                   value={settings.smtpPort}
                   onChange={(e) => handleSettingChange('smtpPort', parseInt(e.target.value))}
-                  disabled={!settings.enableEmailNotifications}
+                  disabled={!settings.enableEmailNotifications || isReadOnly}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -1098,7 +1151,7 @@ const SettingsPage = () => {
                   label="SMTP Username"
                   value={settings.smtpUsername}
                   onChange={(e) => handleSettingChange('smtpUsername', e.target.value)}
-                  disabled={!settings.enableEmailNotifications}
+                  disabled={!settings.enableEmailNotifications || isReadOnly}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -1108,7 +1161,7 @@ const SettingsPage = () => {
                   type="password"
                   value={settings.smtpPassword}
                   onChange={(e) => handleSettingChange('smtpPassword', e.target.value)}
-                  disabled={!settings.enableEmailNotifications}
+                  disabled={!settings.enableEmailNotifications || isReadOnly}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -1117,7 +1170,7 @@ const SettingsPage = () => {
                     <Switch
                       checked={settings.smtpSecure}
                       onChange={(e) => handleSettingChange('smtpSecure', e.target.checked)}
-                      disabled={!settings.enableEmailNotifications}
+                      disabled={!settings.enableEmailNotifications || isReadOnly}
                     />
                   }
                   label="Use Secure Connection (TLS)"
@@ -1140,6 +1193,7 @@ const SettingsPage = () => {
                   variant="outlined"
                   startIcon={<RefreshIcon />}
                   onClick={() => handleConfirmAction('clearCache', 'Clear Cache', 'This will clear all cached data. Continue?')}
+                  disabled={isReadOnly}
                 >
                   Clear Cache
                 </Button>
@@ -1150,6 +1204,7 @@ const SettingsPage = () => {
                   variant="outlined"
                   startIcon={<SearchIcon />}
                   onClick={() => handleConfirmAction('reindexDocuments', 'Reindex Documents', 'This will rebuild the search index. This may take some time. Continue?')}
+                  disabled={isReadOnly}
                 >
                   Reindex Documents
                 </Button>
@@ -1160,6 +1215,7 @@ const SettingsPage = () => {
                   variant="outlined"
                   startIcon={<StorageIcon />}
                   onClick={() => handleConfirmAction('cleanupStorage', 'Cleanup Storage', 'This will remove unused files and optimize storage. Continue?')}
+                  disabled={isReadOnly}
                 >
                   Cleanup Storage
                 </Button>
@@ -1189,6 +1245,7 @@ const SettingsPage = () => {
                     'Delete All Documents', 
                     'This will permanently delete ALL documents from the system. This action cannot be undone and will remove all uploaded files and their metadata. Are you absolutely sure you want to continue?'
                   )}
+                  disabled={isReadOnly}
                 >
                   Delete All Documents
                 </Button>
@@ -1205,6 +1262,7 @@ const SettingsPage = () => {
                     'Delete All Workspaces', 
                     'This will permanently delete ALL workspaces and their associated bookmarks from the system. This action cannot be undone. Are you absolutely sure you want to continue?'
                   )}
+                  disabled={isReadOnly}
                 >
                   Delete All Workspaces
                 </Button>
@@ -1221,6 +1279,7 @@ const SettingsPage = () => {
                     'Full System Cleanup', 
                     'This will permanently delete ALL workspaces AND ALL documents from the system. This will completely reset the system data. This action cannot be undone. Are you absolutely sure you want to continue?'
                   )}
+                  disabled={isReadOnly}
                 >
                   Full System Cleanup
                 </Button>
@@ -1237,6 +1296,7 @@ const SettingsPage = () => {
                     'Reset Settings', 
                     'This will reset all settings to their default values. This action cannot be undone. Continue?'
                   )}
+                  disabled={isReadOnly}
                 >
                   Reset All Settings
                 </Button>

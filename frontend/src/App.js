@@ -16,6 +16,7 @@ import PWAInstallPrompt from './components/offline/PWAInstallPrompt';
 
 // Pages
 import LoginPage from './pages/auth/LoginPage';
+import InstallPage from './pages/InstallPage';
 import Home from './pages/home/Home';
 import SearchPage from './pages/search/SearchPage';
 import DocumentsPage from './pages/documents/DocumentsPage';
@@ -125,6 +126,7 @@ function App() {
                         <Routes>
                             {/* Public Routes */}
                             <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
+                            <Route path="/install" element={<InstallPage />} />
 
                             {/* Protected Routes */}
                             <Route element={<ProtectedRoute />}>

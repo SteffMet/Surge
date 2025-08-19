@@ -17,7 +17,7 @@ router.post(
     body('username', 'Username is required').not().isEmpty(),
     body('email', 'Please include a valid email').isEmail(),
     body('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
-    body('role', 'Role is required').isIn(['basic', 'basic-upload', 'admin'])
+    body('role', 'Role is required').isIn(['basic', 'basic-upload', 'admin', 'superuser'])
   ],
   async (req, res) => {
     // Check for validation errors

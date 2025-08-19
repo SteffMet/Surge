@@ -114,6 +114,11 @@ router.post('/upload',
   auth,
   requireRole(['basic', 'basic-upload', 'admin']),
   (req, res, next) => {
+    // Check if demo mode is enabled
+    if (process.env.DEMO_MODE === 'true' && req.user.role !== 'superuser') {
+      return res.status(403).json({ errors: [{ msg: 'File uploads are disabled in demo mode' }] });
+    }
+    
     upload.single('document')(req, res, (err) => {
       if (err) {
         logger.error('Multer upload error:', err);
@@ -185,7 +190,14 @@ router.post('/upload',
 router.post('/upload-zip',
   auth,
   requireRole(['basic', 'basic-upload', 'admin']),
-  upload.single('zipfile'),
+  (req, res, next) => {
+    // Check if demo mode is enabled
+    if (process.env.DEMO_MODE === 'true' && req.user.role !== 'superuser') {
+      return res.status(403).json({ errors: [{ msg: 'File uploads are disabled in demo mode' }] });
+    }
+    
+    upload.single('zipfile')(req, res, next);
+  },
   async (req, res) => {
     try {
       if (!req.file || req.file.mimetype !== 'application/zip') {

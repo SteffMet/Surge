@@ -55,7 +55,15 @@ services:
       EMBEDDING_MODEL: nomic-embed-text
       EMBEDDING_DIM: 0
       # Demo mode - set to true to show demo login credentials
-      DEMO_MODE: "false"
+      DEMO_MODE: "true"
+      # Superuser configuration
+      SUPERUSER_EMAIL: admin@bitsurge.io
+      SUPERUSER_PASSWORD: SuperAdmin123!
+      SUPERUSER_NAME: System Administrator
+      # Default AI provider - set to 'google' for Google Gemini
+      DEFAULT_AI_PROVIDER: google
+      # Google Gemini API configuration (only needed if using Google AI)
+      GOOGLE_API_KEY: your_google_gemini_api_key_here
       # Centralized timeout configuration with proper hierarchy
       # Frontend API: 30s > Backend AI: 25s > Ollama Service: 20s > Health Check: 5s
       OLLAMA_HEALTH_CHECK_TIMEOUT_MS: 5000
